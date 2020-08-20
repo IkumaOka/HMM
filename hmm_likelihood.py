@@ -1,5 +1,6 @@
 # 参考サイト：https://qiita.com/amber_kshz/items/dadc6cfe67d3b80edeb1
 import numpy as np
+from matplotlib import pyplot as plt
 
 class HMM:
     def __init__(self, K):
@@ -64,6 +65,12 @@ class HMM:
         xi = np.roll(alpha, shift=1, axis=0).reshape(N, self.K, 1) * np.einsum( "jk,nk->njk", self.A, pmatrix * beta) / np.reshape( c, (N, 1,1))
         return gamma, xi
 
+    def _mstep(self, X, gamma, xi):
+        self.pi = gamma[0] / np.sum(gamma[0])
+        xitmp = np.sum(xi[1:], axis=0)
+        self.A = xitmp / np.reshape(np.sum(xitmp, axis=1) , (self.K, 1))
+        self.phi = (gamma.T @ X[:,0])  / np.sum(gamma, axis=0)
+
     
     def fit(self, X, max_iter=1000, tol=1e-3, **kwargs):
         self._init_params(**kwargs)
@@ -123,3 +130,17 @@ for n in range(N):
         X[n][0] = 1.0
     if rv_transition[n] < tp:
         current_state = int(not(current_state))
+
+# fit model
+hmm = HMM(K=2)
+hmm.fit(X, seed_pi=0, seed_A=1, seed_phi=2)
+
+print(f"pi : {hmm.pi}")
+print(f"A : {hmm.A}")
+print(f"phi : {hmm.phi}")
+
+plt.figure(figsize=(12,6))
+plt.plot(states, '.-', label='ground truth latent variable')
+plt.plot(hmm.predict_proba(X)[:,0], '.-', label='predicted probability of state 0')
+plt.plot(0.3*X[:,0]+0.35,'.-',label='observation')
+plt.savefig("results/hmm_cointoss.png")
