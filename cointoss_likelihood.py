@@ -135,12 +135,18 @@ for n in range(N):
 hmm = HMM(K=2)
 hmm.fit(X, seed_pi=0, seed_A=1, seed_phi=2)
 
-print(f"pi : {hmm.pi}")
-print(f"A : {hmm.A}")
-print(f"phi : {hmm.phi}")
+# gamma：潜在変数
+gamma = hmm.predict_proba(X)
+
+# print(gamma.shape) #(データ数, 2), [:, 0]：0になる確率，[:, 1]:1になる確率
+
+# print(f"pi : {hmm.pi}")
+# print(f"A : {hmm.A}")
+# print(f"phi : {hmm.phi}")
 
 plt.figure(figsize=(12,6))
 plt.plot(states, '.-', label='ground truth latent variable')
-plt.plot(hmm.predict_proba(X)[:,0], '.-', label='predicted probability of state 0')
+plt.plot(gamma[:,0], '.-', label='predicted probability of state 0')
 plt.plot(0.3*X[:,0]+0.35,'.-',label='observation')
-plt.savefig("results/hmm_cointoss.png")
+plt.legend()
+plt.savefig("results/cointoss.png")
