@@ -1,4 +1,6 @@
 import MeCab
+import numpy as np
+from hmmlearn import hmm
 
 mecab = MeCab.Tagger()
 
@@ -18,10 +20,26 @@ with open(input_data) as f:
         # 次の単語に進める
         node = node.next
 # リスト内の単語の重複を除去
-words = set(words)
+set_words = set(words)
 
-# 単語：idの辞書を作成
-words_to_idx = {}
-for i, word in enumerate(words):
-    words_to_idx[word] = i
+# 単語：idの単語辞書を作成
+words_id = {}
+for i, word in enumerate(set_words):
+    words_id[word] = i
 
+# 単語系列を全てwords_idのidに変換
+words_to_id = []
+for word in words:
+    for key in words_id:
+        # print(key)
+        if word == key:
+            words_to_id.append(words_id[key])
+
+X = np.reshape(words_to_id, [len(words_to_id), 1])
+
+model = hmm.MultinomialHMM(n_components=5)
+
+model.fit(X)
+
+L,Z = model.decode(X)
+print(Z)
