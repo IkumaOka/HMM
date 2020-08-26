@@ -37,9 +37,11 @@ for word in words:
 
 X = np.reshape(words_to_id, [len(words_to_id), 1])
 
-model = hmm.MultinomialHMM(n_components=5)
+# verbose=Trueで各回のイテレーションを確認できる．
+model = hmm.MultinomialHMM(n_components=10, n_iter=1000, verbose=True)
 
 model.fit(X)
 
 L,Z = model.decode(X)
-print(Z)
+# print(model.transmat_) # 遷移確率の出力 
+# print(model.monitor_) # historyの配列は最後から2つの対数尤度を出力している．
