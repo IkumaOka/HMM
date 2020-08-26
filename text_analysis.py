@@ -1,5 +1,6 @@
 import MeCab
 import numpy as np
+import pickle
 
 class TextAnalysis():
     def mecab_analysis(input_data):
@@ -31,5 +32,9 @@ class TextAnalysis():
                     words_to_id.append(words_id[key])
 
         X = np.reshape(words_to_id, [len(words_to_id), 1])
+
+        # 辞書をpickleで保存
+        with open("./datasets/livedoor/livedoor_dict.pkl","wb") as f:
+            pickle.dump(words_id, f)
 
         return X
